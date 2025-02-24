@@ -19,7 +19,7 @@ interface ApiService {
     fun getUpcomingMovies() : Call<MovieResponse>
 
     @GET("{movie_id}?language=en-US")
-    fun getMovieById(@Path("movice_id") movieId: String) : Call<MovieDto>
+    fun getMovieById(@Path("movie_id") movieId: String) : Call<MovieDto>
 
 
 }
