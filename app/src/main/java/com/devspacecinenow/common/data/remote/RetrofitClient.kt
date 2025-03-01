@@ -1,4 +1,4 @@
-package com.devspacecinenow.common.data
+package com.devspacecinenow.common.data.remote
 
 import com.devspacecinenow.BuildConfig
 import okhttp3.OkHttpClient
@@ -8,10 +8,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val  BASE_URL: String = "https://api.themoviedb.org/3/movie/"
-
 object RetrofitClient {
-
+    private const val BASE_URL:String = "https://api.themoviedb.org/3/movie/"
     private val httpClient: OkHttpClient
         get() {
             val clientBuilder = OkHttpClient.Builder()

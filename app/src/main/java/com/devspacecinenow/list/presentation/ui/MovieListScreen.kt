@@ -1,6 +1,5 @@
 package com.devspacecinenow.list.presentation.ui
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -19,10 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,13 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.devspacecinenow.common.model.MovieDto
-import com.devspacecinenow.common.model.MovieResponse
-import com.devspacecinenow.common.data.RetrofitClient
+import com.devspacecinenow.common.data.remote.model.MovieDto
 import com.devspacecinenow.list.presentation.MovieListViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
 fun MovieListScreen(
@@ -60,11 +52,11 @@ fun MovieListScreen(
 
 @Composable
 private fun MovieListContent(
-    nowPlayingMovies: List<MovieDto>,
-    callTopRatedMovies: List<MovieDto>,
-    callPopularMovies: List<MovieDto>,
-    callUpcomingMovies: List<MovieDto>,
-    onClick: (MovieDto) -> Unit,
+    nowPlayingMovies: MovieListUiState,
+    callTopRatedMovies: MovieListUiState,
+    callPopularMovies: MovieListUiState,
+    callUpcomingMovies: MovieListUiState,
+    onClick: (MovieListData) -> Unit,
 ) {
 
     Column(
@@ -103,7 +95,11 @@ private fun MovieListContent(
 
 
 @Composable
-private fun MovieSession(label: String, movieList: List<MovieDto>, onClick: (MovieDto) -> Unit) {
+private fun MovieSession(
+    label: String,
+    movieList: MovieListUiState,
+    onClick: (MovieListData) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,12 +113,22 @@ private fun MovieSession(label: String, movieList: List<MovieDto>, onClick: (Mov
         Spacer(
             modifier = Modifier.size(8.dp)
         )
-        MovieList(movieList = movieList, onClick = onClick)
+        if (movieList.isError) {
+            Text(
+                color = Color.Red,
+                text = movieList.errorMessage ?: "",
+                fontWeight = FontWeight.SemiBold
+            )
+        } else {
+            MovieList(movieList = movieList.list, onClick = onClick)
+
+        }
+
     }
 }
 
 @Composable
-private fun MovieList(movieList: List<MovieDto>, onClick: (MovieDto) -> Unit) {
+private fun MovieList(movieList: List<MovieListData>, onClick: (MovieListData) -> Unit) {
     LazyRow {
         items(movieList) {
             MovieItem(
@@ -135,7 +141,7 @@ private fun MovieList(movieList: List<MovieDto>, onClick: (MovieDto) -> Unit) {
 }
 
 @Composable
-private fun MovieItem(movieDto: MovieDto, onClick: (MovieDto) -> Unit) {
+private fun MovieItem(movieDto: MovieListData, onClick: (MovieListData) -> Unit) {
 
     Column(
         modifier = Modifier
@@ -151,7 +157,7 @@ private fun MovieItem(movieDto: MovieDto, onClick: (MovieDto) -> Unit) {
                 .width(120.dp)
                 .height(150.dp),
             contentScale = ContentScale.Crop,
-            model = movieDto.postFullPath,
+            model = movieDto.image,
             contentDescription = "${movieDto.title} Poster Image"
         )
         Spacer(
