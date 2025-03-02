@@ -1,11 +1,13 @@
 package com.devspacecinenow.list.data
 
 import com.devspacecinenow.common.data.model.Movie
+import com.devspacecinenow.list.data.local.LocalDataSource
 import com.devspacecinenow.list.data.local.MovieListLocalDataSouce
 import com.devspacecinenow.list.data.remote.MovieListRemoteDataSouce
+import java.net.UnknownHostException
 
 class MovieListRepo(
-    private val local: MovieListLocalDataSouce,
+    private val local: LocalDataSource,
     private val remote: MovieListRemoteDataSouce,
 ) {
 
@@ -13,22 +15,22 @@ class MovieListRepo(
         return try {
             val result = remote.getNowPlaying()
             if (result.isSuccess) {
-                val movieRemote = result.getOrNull() ?: emptyList()
-                if (movieRemote.isNotEmpty()) {
-                    local.updateLocalItems(movieRemote)
-
-                    return Result.success(local.getPlayingNow())
+                val moviesRemote = result.getOrNull() ?: emptyList()
+                if (moviesRemote.isNotEmpty()) {
+                    local.updateLocalItems(moviesRemote)
+                }
+                return Result.success(local.getPlayingNow())
+            } else {
+                val localData = local.getPlayingNow()
+                if (localData.isEmpty()) {
+                    return result
                 } else {
-                    val localData = local.getPlayingNow()
-                    if (localData.isEmpty()) {
-                        return result
-                    } else {
-                        Result.success(localData)
-                    }
+                    Result.success(localData)
                 }
             }
-            return Result.success(local.getPlayingNow())
+
         } catch (ex: Exception) {
+            ex.printStackTrace()
             Result.failure(ex)
         }
     }
@@ -38,25 +40,25 @@ class MovieListRepo(
         return try {
             val result = remote.getTopRated()
             if (result.isSuccess) {
-                val movieRemote = result.getOrNull() ?: emptyList()
-                if (movieRemote.isNotEmpty()) {
-                    local.updateLocalItems(movieRemote)
-
-                    return Result.success(local.getTopRated())
-                } else {
-                    val localData = local.getTopRated()
-                    if (localData.isEmpty()) {
-                        return result
-                    } else {
-                        Result.success(localData)
-                    }
+                val moviesRemote = result.getOrNull() ?: emptyList()
+                if (moviesRemote.isNotEmpty()) {
+                    local.updateLocalItems(moviesRemote)
+                }
+                // Source of truth
+                return Result.success(local.getTopRated())
+            } else {
+                val localData = local.getTopRated()
+                if (localData.isEmpty()) {
+                    return result
+                }else{
+                    Result.success(localData)
                 }
             }
-            return Result.success(local.getTopRated())
+
         } catch (ex: Exception) {
+            ex.printStackTrace()
             Result.failure(ex)
         }
-
     }
 
     suspend fun getPopular(): Result<List<Movie>?> {
@@ -66,18 +68,17 @@ class MovieListRepo(
                 val movieRemote = result.getOrNull() ?: emptyList()
                 if (movieRemote.isNotEmpty()) {
                     local.updateLocalItems(movieRemote)
-
-                    return Result.success(local.getPopular())
+                }
+                return Result.success(local.getPopular())
+            } else {
+                val localData = local.getPopular()
+                if (localData.isEmpty()) {
+                    return result
                 } else {
-                    val localData = local.getPopular()
-                    if (localData.isEmpty()) {
-                        return result
-                    } else {
-                        Result.success(localData)
-                    }
+                    Result.success(localData)
                 }
             }
-            return Result.success(local.getPopular())
+
         } catch (ex: Exception) {
             Result.failure(ex)
         }
@@ -91,18 +92,17 @@ class MovieListRepo(
                 val movieRemote = result.getOrNull() ?: emptyList()
                 if (movieRemote.isNotEmpty()) {
                     local.updateLocalItems(movieRemote)
-
-                    return Result.success(local.getUpcoming())
+                }
+                return Result.success(local.getUpcoming())
+            } else {
+                val localData = local.getUpcoming()
+                if (localData.isEmpty()) {
+                    return result
                 } else {
-                    val localData = local.getUpcoming()
-                    if (localData.isEmpty()) {
-                        return result
-                    } else {
-                        Result.success(localData)
-                    }
+                    Result.success(localData)
                 }
             }
-            return Result.success(local.getUpcoming())
+
         } catch (ex: Exception) {
             Result.failure(ex)
         }

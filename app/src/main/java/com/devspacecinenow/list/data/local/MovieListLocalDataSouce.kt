@@ -7,25 +7,25 @@ import com.devspacecinenow.common.data.model.Movie
 
 class MovieListLocalDataSouce(
     private val dao: MovieDao,
-) {
+): LocalDataSource {
 
-    suspend fun getPlayingNow(): List<Movie>{
+    override suspend fun getPlayingNow(): List<Movie>{
         return getMoviesByCategory(MovieCategory.NowPlaying)
     }
 
-    suspend fun getUpcoming(): List<Movie>{
+    override suspend fun getUpcoming(): List<Movie>{
         return getMoviesByCategory(MovieCategory.Upcoming)
     }
 
-    suspend fun getTopRated(): List<Movie>{
+    override suspend fun getTopRated(): List<Movie>{
         return getMoviesByCategory(MovieCategory.TopRated)
     }
 
-    suspend fun getPopular(): List<Movie>{
+    override suspend fun getPopular(): List<Movie>{
         return getMoviesByCategory(MovieCategory.Popular)
     }
 
-    suspend fun updateLocalItems(movies: List<Movie>){
+    override suspend fun updateLocalItems(movies: List<Movie>){
         val entities = movies.map {
             MovieEntity(
                 id = it.id,

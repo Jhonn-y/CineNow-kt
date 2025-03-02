@@ -11,6 +11,8 @@ import com.devspacecinenow.list.data.remote.ListService
 import com.devspacecinenow.list.data.MovieListRepo
 import com.devspacecinenow.list.presentation.ui.MovieListData
 import com.devspacecinenow.list.presentation.ui.MovieListUiState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,7 @@ import java.net.UnknownHostException
 
 class MovieListViewModel(
     private val movieListRepo: MovieListRepo,
+    private val dispatcher : CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
     private val _uiNowplaying = MutableStateFlow(MovieListUiState())
     val uiNowplaying: StateFlow<MovieListUiState> = _uiNowplaying
@@ -42,7 +45,7 @@ class MovieListViewModel(
 
     private fun fetchNowPlaying() {
         _uiNowplaying.value = MovieListUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
 
             val result = movieListRepo.getNowPlaying()
             if (result.isSuccess) {
@@ -77,40 +80,38 @@ class MovieListViewModel(
 
     private fun fetchTopRated() {
         _uiTopRated.value = MovieListUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
-                val response = movieListRepo.getTopRated()
-                if (response.isSuccess) {
-                    val movies = response.getOrNull()
-                    if (movies != null) {
-                        val movieListData = movies.map { movieDto ->
-                            MovieListData(
-                                id = movieDto.id,
-                                title = movieDto.title,
-                                overview = movieDto.overview,
-                                image = movieDto.image
-                            )
-                        }
-                        _uiTopRated.value = MovieListUiState(list = movieListData)
-                    }
-                } else {
-                    val ex = response.exceptionOrNull()
-                    if (ex is UnknownHostException) {
-                        _uiTopRated.value = MovieListUiState(
-                            isError = true,
-                            errorMessage = "Not internet Connection"
+        viewModelScope.launch(dispatcher) {
+            val response = movieListRepo.getTopRated()
+            if (response.isSuccess) {
+                val movies = response.getOrNull()
+                if (movies != null) {
+                    val movieUiDataList = movies.map { movieDto ->
+                        MovieListData(
+                            id = movieDto.id,
+                            title = movieDto.title,
+                            overview = movieDto.overview,
+                            image = movieDto.image
                         )
-
-                    } else {
-                        _uiTopRated.value = MovieListUiState(isError = true)
-
                     }
+                    _uiTopRated.value = MovieListUiState(list = movieUiDataList)
                 }
+            } else {
+                val ex = response.exceptionOrNull()
+                if (ex is UnknownHostException) {
+                    _uiTopRated.value = MovieListUiState(
+                        isError = true,
+                        errorMessage = "Not internet connection"
+                    )
+                } else {
+                    _uiTopRated.value = MovieListUiState(isError = true)
+                }
+            }
         }
     }
 
     private fun fetchPopular() {
         _uiPopular.value = MovieListUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
                 val response = movieListRepo.getPopular()
                 if (response.isSuccess) {
                     val movies = response.getOrNull()
@@ -143,7 +144,7 @@ class MovieListViewModel(
 
     private fun fetchUpcoming() {
         _uiUpcoming.value = MovieListUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
                 val response = movieListRepo.getUpcoming()
                 if (response.isSuccess) {
                     val movies = response.getOrNull()
