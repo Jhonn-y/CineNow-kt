@@ -11,12 +11,10 @@ import androidx.compose.ui.Modifier
 import com.devspacecinenow.detail.presentation.MovieDetailViewModel
 import com.devspacecinenow.list.presentation.MovieListViewModel
 import com.devspacecinenow.ui.theme.CineNowTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val listViewModel by viewModels<MovieListViewModel> { MovieListViewModel.Factory }
-    private val detailViewModel by viewModels<MovieDetailViewModel> { MovieDetailViewModel.Factory }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +26,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CineNowApp(
-                        listViewModel = listViewModel,
-                        detailViewModel = detailViewModel
-
-                    )
+                    CineNowApp()
                 }
             }
         }

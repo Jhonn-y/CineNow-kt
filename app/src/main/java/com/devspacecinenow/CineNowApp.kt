@@ -10,16 +10,14 @@ import com.devspacecinenow.detail.presentation.MovieDetailViewModel
 import com.devspacecinenow.detail.presentation.ui.MovieDetailScreen
 import com.devspacecinenow.list.presentation.MovieListViewModel
 import com.devspacecinenow.list.presentation.ui.MovieListScreen
+import dagger.hilt.android.HiltAndroidApp
 
 @Composable
-fun CineNowApp(
-    listViewModel: MovieListViewModel,
-    detailViewModel: MovieDetailViewModel
-) {
+fun CineNowApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "movieList"){
         composable(route = "movieList"){
-            MovieListScreen(navController, listViewModel)
+            MovieListScreen(navController)
         }
         composable(route = "movieDetail" + "/{itemId}",
             arguments = listOf(navArgument("itemId"){
@@ -27,7 +25,7 @@ fun CineNowApp(
             })
         ){ backStackEntry ->
             val movieId = requireNotNull(backStackEntry.arguments?.getString("itemId"))
-            MovieDetailScreen(movieId, navController,detailViewModel)
+            MovieDetailScreen(movieId, navController)
         }
     }
 

@@ -3,7 +3,7 @@ package com.devspacecinenow.list
 import com.devspacecinenow.common.data.local.MovieCategory
 import com.devspacecinenow.common.data.model.Movie
 import com.devspacecinenow.list.data.MovieListRepo
-import com.devspacecinenow.list.data.remote.MovieListRemoteDataSouce
+import com.devspacecinenow.list.data.remote.MovieListRemoteDataSource
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.TestCase.assertEquals
@@ -14,7 +14,7 @@ import java.net.UnknownHostException
 
 class MovieListRepoTest {
     private val local = FakeMovieListLocalDataSource()
-    private val remote: MovieListRemoteDataSouce = mock()
+    private val remote: MovieListRemoteDataSource = mock()
 
     private val underTest by lazy {
         MovieListRepo(

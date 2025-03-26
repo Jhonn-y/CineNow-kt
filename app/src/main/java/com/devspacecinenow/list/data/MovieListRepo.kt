@@ -2,13 +2,12 @@ package com.devspacecinenow.list.data
 
 import com.devspacecinenow.common.data.model.Movie
 import com.devspacecinenow.list.data.local.LocalDataSource
-import com.devspacecinenow.list.data.local.MovieListLocalDataSouce
-import com.devspacecinenow.list.data.remote.MovieListRemoteDataSouce
-import java.net.UnknownHostException
+import com.devspacecinenow.list.data.remote.MovieListRemoteDataSource
+import javax.inject.Inject
 
-class MovieListRepo(
+class MovieListRepo @Inject constructor(
     private val local: LocalDataSource,
-    private val remote: MovieListRemoteDataSouce,
+    private val remote: MovieListRemoteDataSource,
 ) {
 
     suspend fun getNowPlaying(): Result<List<Movie>?> {
